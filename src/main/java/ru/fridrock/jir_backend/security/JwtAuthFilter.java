@@ -23,8 +23,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     String authHeader = request.getHeader("Authorization");
     if (authHeader != null && authHeader.startsWith("Bearer")) {
       String token = authHeader.substring(7);
-      JirAuthentication jirAuthentication = new JirAuthentication("", token, false);
+      JirAuthentication jirAuthentication = new JirAuthentication("", null,token, false);
       Authentication authentication = authenticationManager.authenticate(jirAuthentication);
+      log.info("received user with id:" + ((JirAuthentication)authentication).getUserId());
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProtectedController {
   @GetMapping("/")
   public String hello(){
-    return "hello";
+    return "hello223";
   }
 }

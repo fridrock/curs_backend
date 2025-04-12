@@ -22,9 +22,10 @@ public class JwtTokenUtils {
   @Value("${jwt.expiration}")
   private Long expiration;
 
-  public String generateToken(UserDetails userDetails) {
+  public String generateToken(UserToken userToken) {
     Map<String, Object> claims = new HashMap<>();
-    return createToken(claims, userDetails.getUsername());
+    claims.put("userId", userToken.userId());
+    return createToken(claims, userToken.username());
   }
 
 

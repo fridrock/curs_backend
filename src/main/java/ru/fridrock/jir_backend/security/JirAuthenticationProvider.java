@@ -9,6 +9,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import ru.fridrock.jir_backend.utils.jwt.JwtTokenUtils;
 
+import java.util.UUID;
+
+
 @Component
 @RequiredArgsConstructor
 public class JirAuthenticationProvider implements AuthenticationProvider {
@@ -19,7 +22,7 @@ public class JirAuthenticationProvider implements AuthenticationProvider {
     try{
       Claims claims = jwtTokenUtils.parseToken(jirAuthentication.getToken());
       if (claims.getSubject()!=null){
-        //TODO fill jirAuthentication from token
+        jirAuthentication.setUserId(UUID.fromString(claims.get("userId").toString()));
         jirAuthentication.setUsername(claims.getSubject());
         jirAuthentication.setAuthenticated(true);
       }

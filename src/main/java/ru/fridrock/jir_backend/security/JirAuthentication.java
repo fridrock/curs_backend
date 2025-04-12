@@ -7,11 +7,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Setter
 public class JirAuthentication implements Authentication {
   private String username;
+  @Getter
+  private UUID userId;
   @Getter
   private String token;
   private boolean isAuthenticated;

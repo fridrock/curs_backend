@@ -1,6 +1,7 @@
 package ru.fridrock.jir_backend.controllers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,28 +10,30 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.fridrock.jir_backend.dto.input.AuthRequest;
 import ru.fridrock.jir_backend.dto.input.RegisterRequest;
 import ru.fridrock.jir_backend.dto.output.AuthResponse;
-import ru.fridrock.jir_backend.security.JirUserDetails;
 import ru.fridrock.jir_backend.service.UserService;
 import ru.fridrock.jir_backend.utils.jwt.JwtTokenUtils;
+import ru.fridrock.jir_backend.utils.jwt.UserToken;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UsersController {
   private final JwtTokenUtils jwtTokenUtils;
-  private final UserDetailsService userDetailsService;
   private final UserService userService;
 
   @PostMapping("/reg")
   public AuthResponse register(@RequestBody RegisterRequest dto) {
-    //TODO create user with such credentials
-    return new AuthResponse(jwtTokenUtils.generateToken(new JirUserDetails("Somename")));
+    UserToken userToken = userService.createUser(dto);
+    log.info("create user with userId:" + userToken.userId().toString());
+    return new AuthResponse(jwtTokenUtils.generateToken(userToken));
 
   }
 
   @PostMapping("/auth")
   public AuthResponse auth(@RequestBody AuthRequest dto) {
     //TODO check username && password
-    return new AuthResponse(jwtTokenUtils.generateToken(userDetailsService.loadUserByUsername(dto.username())));
+    UserToken userToken = userService.authenticateUser(dto);
+    return new AuthResponse(jwtTokenUtils.generateToken(userToken));
   }
 }
