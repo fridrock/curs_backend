@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: jir_backend
+jwt:
+  secret: "my_secret_long_long_long_long_long_long_long"
+  expiration: 3600000
+
