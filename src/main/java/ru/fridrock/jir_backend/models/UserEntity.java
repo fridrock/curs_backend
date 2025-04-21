@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -26,4 +27,7 @@ public class UserEntity {
   private String username;
   @Column(name = "password_hash",  nullable = false)
   private String passwordHash;
+
+  @OneToMany(mappedBy = "owner")
+  private Set<ProjectEntity> projects;
 }

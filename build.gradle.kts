@@ -31,6 +31,11 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.4.4")
 	implementation("org.postgresql:postgresql:42.7.5")
+	implementation("org.mapstruct:mapstruct:1.5.5.Final")
+	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+	compileOnly("org.projectlombok:lombok:1.18.30")
+	annotationProcessor("org.projectlombok:lombok:1.18.30")
+	annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 	compileOnly("org.projectlombok:lombok")
@@ -47,4 +52,13 @@ dependencies {
 }
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+
+tasks.withType<JavaCompile> {
+	options.compilerArgs.addAll(listOf(
+			"-Amapstruct.suppressGeneratorTimestamp=true",
+			"-Amapstruct.suppressGeneratorVersionInfoComment=true",
+			"-Amapstruct.defaultComponentModel=spring" // Optional
+	))
 }

@@ -1,5 +1,6 @@
 package ru.fridrock.jir_backend.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -8,12 +9,29 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class CustomControllerAdvice {
   @ExceptionHandler(UnauthorizedException.class)
-  public ResponseEntity<CustomProblemDetails> handleUnauthorizedException(UnauthorizedException ex){
+  public ResponseEntity<CustomProblemDetails> handleUnauthorizedException(
+      UnauthorizedException ex,
+      HttpServletRequest request) {
     int status = HttpStatus.UNAUTHORIZED.value();
     CustomProblemDetails customProblemDetails = CustomProblemDetails.builder()
         .status(status)
         .title("Error authorizing")
         .details(ex.getMessage())
+        .path(request.getMethod() + " " +request.getRequestURI())
+        .build();
+    return ResponseEntity.status(status).body(customProblemDetails);
+  }
+
+  @ExceptionHandler(NotFoundException.class)
+  public ResponseEntity<CustomProblemDetails> handleNotFoundException(
+      NotFoundException ex,
+      HttpServletRequest request) {
+    int status = HttpStatus.NOT_FOUND.value();
+    CustomProblemDetails customProblemDetails = CustomProblemDetails.builder()
+        .status(status)
+        .title("Not found")
+        .details(ex.getMessage())
+        .path(request.getMethod() + " " +request.getRequestURI())
         .build();
     return ResponseEntity.status(status).body(customProblemDetails);
   }

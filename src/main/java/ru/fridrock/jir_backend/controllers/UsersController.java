@@ -2,13 +2,12 @@ package ru.fridrock.jir_backend.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.fridrock.jir_backend.dto.input.AuthRequest;
-import ru.fridrock.jir_backend.dto.input.RegisterRequest;
+import ru.fridrock.jir_backend.dto.input.user.AuthRequest;
+import ru.fridrock.jir_backend.dto.input.user.RegisterRequest;
 import ru.fridrock.jir_backend.dto.output.AuthResponse;
 import ru.fridrock.jir_backend.service.UserService;
 import ru.fridrock.jir_backend.utils.jwt.JwtTokenUtils;
