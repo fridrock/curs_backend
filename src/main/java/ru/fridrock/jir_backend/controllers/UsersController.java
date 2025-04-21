@@ -32,7 +32,6 @@ public class UsersController {
 
   @PostMapping("/auth")
   public AuthResponse auth(@RequestBody AuthRequest dto) {
-    //TODO check username && password
     UserToken userToken = userService.authenticateUser(dto);
     return new AuthResponse(jwtTokenUtils.generateToken(userToken));
   }
