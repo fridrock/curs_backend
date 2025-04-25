@@ -26,14 +26,16 @@ public class AIController {
         String promptText =
             String.format("""
                 inputText is: %s
-                Current Date is 2025:04:25:19:26:10.  
+                Current Date is %s.  
                 Parse date offset from inputText
                 Determine next date using formula: current date + offset
-                Determine title and description for task from inputText
+                Determine title - name for task from inputText, don't provide information about date, or priority
+                Determine description for task from inputText, if there is no data for description, just write empty string
+                If there is a lot of data, you can subtract it on subparagraphs and format each on new line
                 Determine priority of task from inputText
-                Priority can be one of three values: LOW, NORMAL, HIGH
-                return json with nextDate, title, description, priority, date in format LocalDateTime"
-                """, inputText);
+                Priority can be one of three values: LOW, HIGH, CRITICAL
+                return json with nextDate, title, description, priority"
+                """, dto.message(), LocalDateTime.now());
         System.out.println(promptText);
         ChatResponse response = ollamaChatModel.call(new Prompt(promptText));
         return response.getResult()
