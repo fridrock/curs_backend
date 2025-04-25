@@ -21,12 +21,19 @@ public class AIController {
     public String getAi(AiDto dto) {
         String currentDate = LocalDateTime.now()
             .toString();
-
+        String inputText =
+            "Сделать домашку через два дня, для этого надо сделать информатику математику и биологию, очень важно";
         String promptText =
-            String.format("Current Date is 2025:04:25:19:26:10.  There is some date offset in this text : " +
-                    "'Сделать домашку через неделю , для этого надо сделать информатику математику и биологию, очень важно'" +
-                    ",determine next date using formula: current date + offset, return json {date: currentDate}, date в формате LocalDateTime",
-                currentDate);
+            String.format("""
+                inputText is: %s
+                Current Date is 2025:04:25:19:26:10.  
+                Parse date offset from inputText
+                Determine next date using formula: current date + offset
+                Determine title and description for task from inputText
+                Determine priority of task from inputText
+                Priority can be one of three values: LOW, NORMAL, HIGH
+                return json with nextDate, title, description, priority, date in format LocalDateTime"
+                """, inputText);
         System.out.println(promptText);
         ChatResponse response = ollamaChatModel.call(new Prompt(promptText));
         return response.getResult()
