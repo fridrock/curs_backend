@@ -10,8 +10,6 @@ import ru.fridrock.jir_backend.models.UserEntity;
 import ru.fridrock.jir_backend.repository.UserRepository;
 import ru.fridrock.jir_backend.utils.jwt.UserToken;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -36,6 +34,6 @@ public class UserService {
     if(!passwordEncoder.matches(dto.password(), userEntity.getPasswordHash())){
       throw new UnauthorizedException("wrong password");
     }
-    return new UserToken(dto.username(), UUID.randomUUID());
+      return new UserToken(dto.username(), userEntity.getId());
   }
 }

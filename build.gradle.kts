@@ -8,10 +8,21 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
+extra["springAiVersion"] = "1.0.0-M7"
 
+dependencies {
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+dependencyManagement {
+	imports {
+		mavenBom("org.springframework.ai:spring-ai-bom:${property("springAiVersion")}")
+	}
+}
 configurations {
 	compileOnly {
 		extendsFrom(configurations.annotationProcessor.get())
@@ -43,6 +54,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
 	testImplementation("org.testcontainers:junit-jupiter")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.springframework.ai:spring-ai-starter-model-ollama")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 

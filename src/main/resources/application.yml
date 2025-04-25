@@ -13,6 +13,13 @@ spring:
   sql:
     init:
       platform: postgres
+  ai:
+    ollama:
+      base-url: http://127.0.0.1:11434
+      chat:
+        options:
+          model: gemma3
+
 
 jwt:
   secret: "my_secret_long_long_long_long_long_long_long"
