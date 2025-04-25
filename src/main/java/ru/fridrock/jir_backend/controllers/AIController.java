@@ -1,5 +1,7 @@
 package ru.fridrock.jir_backend.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.fridrock.jir_backend.dto.AiDto;
+import ru.fridrock.jir_backend.dto.AiTaskDto;
 
 import java.time.LocalDateTime;
 
@@ -16,9 +19,10 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AIController {
     private final OllamaChatModel ollamaChatModel;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
-    public String getAi(AiDto dto) {
+    public AiTaskDto getAi(AiDto dto) throws JsonProcessingException {
         String currentDate = LocalDateTime.now()
             .toString();
         String inputText =
@@ -36,10 +40,14 @@ public class AIController {
                 Priority can be one of three values: LOW, HIGH, CRITICAL
                 return json with nextDate, title, description, priority"
                 """, dto.message(), LocalDateTime.now());
-        System.out.println(promptText);
+
         ChatResponse response = ollamaChatModel.call(new Prompt(promptText));
-        return response.getResult()
+        String output = response.getResult()
             .getOutput()
-            .getText();
+            .getText()
+            .replaceAll("```json|```", "")
+            .trim();
+        AiTaskDto taskDto = objectMapper.readValue(output, AiTaskDto.class);
+        return taskDto;
     }
 }
