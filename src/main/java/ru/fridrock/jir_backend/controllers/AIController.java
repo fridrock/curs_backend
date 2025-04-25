@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.fridrock.jir_backend.dto.AiDto;
-import ru.fridrock.jir_backend.dto.AiTaskDto;
 
 import java.time.LocalDateTime;
 
@@ -22,15 +21,17 @@ public class AIController {
     private final ObjectMapper objectMapper;
 
     @GetMapping
-    public AiTaskDto getAi(AiDto dto) throws JsonProcessingException {
+    public String getAi(AiDto dto) throws JsonProcessingException {
         String currentDate = LocalDateTime.now()
             .toString();
         String inputText =
             "Сделать домашку через два дня, для этого надо сделать информатику математику и биологию, очень важно";
         String promptText =
             String.format("""
-                inputText is: %s
+                Here is input for tasks: %s
+                Tasks are separated by subparagraphs like 1)
                 Current Date is %s.  
+                For each task:
                 Parse date offset from inputText
                 Determine next date using formula: current date + offset
                 Determine title - name for task from inputText, don't provide information about date, or priority
@@ -38,7 +39,9 @@ public class AIController {
                 If there is a lot of data, you can subtract it on subparagraphs and format each on new line
                 Determine priority of task from inputText
                 Priority can be one of three values: LOW, HIGH, CRITICAL
-                return json with nextDate, title, description, priority"
+                create json with nextDate, title, description, priority
+                combine this tasks into one json
+                                
                 """, dto.message(), LocalDateTime.now());
 
         ChatResponse response = ollamaChatModel.call(new Prompt(promptText));
@@ -47,7 +50,8 @@ public class AIController {
             .getText()
             .replaceAll("```json|```", "")
             .trim();
-        AiTaskDto taskDto = objectMapper.readValue(output, AiTaskDto.class);
-        return taskDto;
+        ;
+//        AiTaskDto taskDto = objectMapper.readValue(output, AiTaskDto.class);
+        return output;
     }
 }
