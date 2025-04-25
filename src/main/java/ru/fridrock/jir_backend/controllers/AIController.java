@@ -1,6 +1,7 @@
 package ru.fridrock.jir_backend.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.fridrock.jir_backend.dto.AiDto;
+import ru.fridrock.jir_backend.dto.AiTaskDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/ai")
@@ -21,11 +24,7 @@ public class AIController {
     private final ObjectMapper objectMapper;
 
     @GetMapping
-    public String getAi(AiDto dto) throws JsonProcessingException {
-        String currentDate = LocalDateTime.now()
-            .toString();
-        String inputText =
-            "Сделать домашку через два дня, для этого надо сделать информатику математику и биологию, очень важно";
+    public List<AiTaskDto> getAi(AiDto dto) throws JsonProcessingException {
         String promptText =
             String.format("""
                 Here is input for tasks: %s
@@ -41,17 +40,19 @@ public class AIController {
                 Priority can be one of three values: LOW, HIGH, CRITICAL
                 create json with nextDate, title, description, priority
                 combine this tasks into one json
-                                
                 """, dto.message(), LocalDateTime.now());
 
         ChatResponse response = ollamaChatModel.call(new Prompt(promptText));
+        TypeReference<List<AiTaskDto>> jacksonTypeReference = new TypeReference<List<AiTaskDto>>() {
+        };
+
         String output = response.getResult()
             .getOutput()
             .getText()
             .replaceAll("```json|```", "")
             .trim();
         ;
-//        AiTaskDto taskDto = objectMapper.readValue(output, AiTaskDto.class);
-        return output;
+        List<AiTaskDto> aiTaskDtos = objectMapper.readValue(output, jacksonTypeReference);
+        return aiTaskDtos;
     }
 }
