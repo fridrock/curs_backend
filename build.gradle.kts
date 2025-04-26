@@ -8,7 +8,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
 
@@ -31,6 +31,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.4.4")
 	implementation("org.postgresql:postgresql:42.7.5")
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 	compileOnly("org.projectlombok:lombok:1.18.30")
 	annotationProcessor("org.projectlombok:lombok:1.18.30")

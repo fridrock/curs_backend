@@ -16,9 +16,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import ru.fridrock.jir_backend.utils.jwt.JwtTokenUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -35,6 +33,8 @@ public class SecurityConfig {
             .requestMatchers("/api/v1/users/**").permitAll()
             .requestMatchers("/swagger-ui/**").permitAll()
             .requestMatchers("/v3/api-docs/**").permitAll()
+            .requestMatchers("/v3/v1/tasks/**")
+            .permitAll()
             .anyRequest().authenticated()
         )
 

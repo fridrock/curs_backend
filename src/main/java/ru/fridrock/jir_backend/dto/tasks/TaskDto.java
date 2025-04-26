@@ -1,5 +1,6 @@
 package ru.fridrock.jir_backend.dto.tasks;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.fridrock.jir_backend.models.enums.TaskPriority;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ public record TaskDto(
         UUID projectId,
         String title,
         String description,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         LocalDateTime deadline,
         TaskPriority priority,
         Integer hoursSpent) {
