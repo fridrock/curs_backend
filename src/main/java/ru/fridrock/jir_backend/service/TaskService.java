@@ -24,7 +24,6 @@ import ru.fridrock.jir_backend.repository.ProjectRepository;
 import ru.fridrock.jir_backend.repository.TaskRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,10 +37,7 @@ public class TaskService {
     private final IMapper<TaskDto, TaskEntity> mapper;
     private static final String prompt = """
                 Here is input for tasks: %s
-                Tasks are separated by subparagraphs like 1)
-                Tasks amount is equal to amount of subparagraphs like 1), 2) 
                 Current Date is %s.  
-                For each task:
                 Parse date offset from inputText
                 Determine deadline using formula: current date + offset
                 Determine title - name for task from inputText, don't provide information about date, or priority
@@ -49,7 +45,6 @@ public class TaskService {
                 Determine priority of task from inputText
                 Priority can be strictly only one of three values: LOW, HIGH, CRITICAL
                 create json with deadline, title, description, priority
-                combine this tasks into one json
         """;
     private final OllamaChatModel ollamaChatModel;
     private final ObjectMapper objectMapper;
@@ -121,7 +116,7 @@ public class TaskService {
             " wasn't found");
     }
 
-    public List<TaskDto> generateTasksWithAi(AiCreateTaskDto dto) {
+    public TaskDto generateTasksWithAi(AiCreateTaskDto dto) {
         String promptText = String.format(prompt, dto.message(), LocalDateTime.now());
         ChatResponse response = ollamaChatModel.call(new Prompt(promptText));
         TypeReference<List<AiTaskDto>> jacksonTypeReference = new TypeReference<List<AiTaskDto>>() {
@@ -134,19 +129,13 @@ public class TaskService {
             .trim();
         ;
         try {
-            List<AiTaskDto> aiTasks = objectMapper.readValue(output, jacksonTypeReference);
-            log.info("received ai tasks: {}", aiTasks);
-            List<TaskDto> tasksToCreate = aiTasks.stream()
-                .map((aiTask) -> taskDtoFromAiTask(aiTask, dto.projectId()))
-                .collect(Collectors.toList());
-            log.info("mapped to tasks: {}", tasksToCreate);
-            List<TaskDto> createdTasks = new ArrayList<>();
-            for (TaskDto taskToCreate : tasksToCreate) {
-                TaskDto created = create(taskToCreate);
-                createdTasks.add(created);
-            }
-            log.info("created tasks: {}", createdTasks);
-            return createdTasks;
+            AiTaskDto aiTask = objectMapper.readValue(output, AiTaskDto.class);
+            log.info("received ai task: {}", aiTask);
+            TaskDto taskToCreate = taskDtoFromAiTask(aiTask, dto.projectId());
+            log.info("mapped to task: {}", taskToCreate);
+            TaskDto created = create(taskToCreate);
+            log.info("created task: {}", created);
+            return created;
         } catch (JsonProcessingException ex) {
             throw new AiGenerationException("Failed to parse AI response");
         }

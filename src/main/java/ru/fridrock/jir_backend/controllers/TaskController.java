@@ -55,7 +55,7 @@ public class TaskController {
     }
 
     @PostMapping("/ai")
-    public List<TaskDto> createTaskByAi(@RequestBody AiCreateTaskDto dto) {
+    public TaskDto createTaskByAi(@RequestBody AiCreateTaskDto dto) {
         return taskService.generateTasksWithAi(dto);
     }
 
