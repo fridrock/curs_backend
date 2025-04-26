@@ -41,8 +41,9 @@ public class TaskController {
 
     ;
 
-    @GetMapping("/{projectId}")
-    public List<TaskDto> get(@PathVariable(name = "projectId") UUID projectId) {
+    @GetMapping("/byProject/{projectId}")
+
+    public List<TaskDto> get(@PathVariable UUID projectId) {
         return taskService.getByProjectId(projectId);
     }
 

@@ -35,4 +35,19 @@ public class CustomControllerAdvice {
         .build();
     return ResponseEntity.status(status).body(customProblemDetails);
   }
+
+  @ExceptionHandler(UserAlreadyExistException.class)
+  public ResponseEntity<CustomProblemDetails> handleUserAlreadyExist(
+      UserAlreadyExistException ex,
+      HttpServletRequest request) {
+    int status = HttpStatus.CONFLICT.value();
+    CustomProblemDetails customProblemDetails = CustomProblemDetails.builder()
+        .status(status)
+        .title("User already exist")
+        .details(ex.getMessage())
+        .path(request.getMethod() + " " + request.getRequestURI())
+        .build();
+    return ResponseEntity.status(status)
+        .body(customProblemDetails);
+  }
 }
