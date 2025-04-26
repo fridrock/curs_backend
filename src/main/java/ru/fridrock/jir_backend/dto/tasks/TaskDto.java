@@ -13,6 +13,8 @@ public record TaskDto(
         String description,
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         LocalDateTime deadline,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        LocalDateTime issued,
         TaskPriority priority,
         Integer hoursSpent) {
 }
