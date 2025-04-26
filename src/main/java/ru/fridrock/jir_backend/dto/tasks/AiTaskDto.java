@@ -1,7 +1,7 @@
-package ru.fridrock.jir_backend.dto;
+package ru.fridrock.jir_backend.dto.tasks;
 
 public record AiTaskDto(String title,
-                        String nextDate,
+                        String deadline,
                         String description,
                         String priority) {
 }

@@ -1,28 +1,60 @@
 package ru.fridrock.jir_backend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.stereotype.Service;
+import ru.fridrock.jir_backend.dto.tasks.AiCreateTaskDto;
+import ru.fridrock.jir_backend.dto.tasks.AiTaskDto;
 import ru.fridrock.jir_backend.dto.tasks.TaskDto;
+import ru.fridrock.jir_backend.exception.AiGenerationException;
 import ru.fridrock.jir_backend.exception.NotFoundException;
 import ru.fridrock.jir_backend.mappers.IMapper;
 import ru.fridrock.jir_backend.models.TaskEntity;
+import ru.fridrock.jir_backend.models.enums.TaskPriority;
 import ru.fridrock.jir_backend.models.enums.TaskSource;
 import ru.fridrock.jir_backend.models.enums.TaskStatus;
 import ru.fridrock.jir_backend.repository.ProjectRepository;
 import ru.fridrock.jir_backend.repository.TaskRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final IMapper<TaskDto, TaskEntity> mapper;
+    private static final String prompt = """
+                Here is input for tasks: %s
+                Tasks are separated by subparagraphs like 1)
+                Tasks amount is equal to amount of subparagraphs like 1), 2) 
+                Current Date is %s.  
+                For each task:
+                Parse date offset from inputText
+                Determine deadline using formula: current date + offset
+                Determine title - name for task from inputText, don't provide information about date, or priority
+                Determine description for task from inputText, if there is no data for description, just write empty string
+                Determine priority of task from inputText
+                Priority can be strictly only one of three values: LOW, HIGH, CRITICAL
+                create json with deadline, title, description, priority
+                combine this tasks into one json
+        """;
+    private final OllamaChatModel ollamaChatModel;
+    private final ObjectMapper objectMapper;
+
+//                If there is a lot of data, you can subtract it on subparagraphs and format each on new line
 
     public TaskDto create(TaskDto dto) {
         var project = projectRepository.findById(dto.projectId())
@@ -87,5 +119,51 @@ public class TaskService {
         return new NotFoundException("task with id: " +
             taskId +
             " wasn't found");
+    }
+
+    public List<TaskDto> generateTasksWithAi(AiCreateTaskDto dto) {
+        String promptText = String.format(prompt, dto.message(), LocalDateTime.now());
+        ChatResponse response = ollamaChatModel.call(new Prompt(promptText));
+        TypeReference<List<AiTaskDto>> jacksonTypeReference = new TypeReference<List<AiTaskDto>>() {
+        };
+
+        String output = response.getResult()
+            .getOutput()
+            .getText()
+            .replaceAll("```json|```", "")
+            .trim();
+        ;
+        try {
+            List<AiTaskDto> aiTasks = objectMapper.readValue(output, jacksonTypeReference);
+            log.info("received ai tasks: {}", aiTasks);
+            List<TaskDto> tasksToCreate = aiTasks.stream()
+                .map((aiTask) -> taskDtoFromAiTask(aiTask, dto.projectId()))
+                .collect(Collectors.toList());
+            log.info("mapped to tasks: {}", tasksToCreate);
+            List<TaskDto> createdTasks = new ArrayList<>();
+            for (TaskDto taskToCreate : tasksToCreate) {
+                TaskDto created = create(taskToCreate);
+                createdTasks.add(created);
+            }
+            log.info("created tasks: {}", createdTasks);
+            return createdTasks;
+        } catch (JsonProcessingException ex) {
+            throw new AiGenerationException("Failed to parse AI response");
+        }
+    }
+
+    private TaskDto taskDtoFromAiTask(AiTaskDto aiTask, UUID projectId) {
+        return TaskDto.builder()
+            .projectId(projectId)
+            .source(TaskSource.AI)
+            .deadline(parseDeadline(aiTask.deadline()))
+            .description(aiTask.description())
+            .title(aiTask.title())
+            .priority(TaskPriority.valueOf(aiTask.priority()))
+            .build();
+    }
+
+    private LocalDateTime parseDeadline(String deadline) {
+        return LocalDateTime.parse(deadline);
     }
 }

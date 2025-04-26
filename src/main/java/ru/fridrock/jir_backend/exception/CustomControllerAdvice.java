@@ -50,4 +50,19 @@ public class CustomControllerAdvice {
     return ResponseEntity.status(status)
         .body(customProblemDetails);
   }
+
+  @ExceptionHandler(AiGenerationException.class)
+  public ResponseEntity<CustomProblemDetails> handleAiGenerationException(
+      AiGenerationException ex,
+      HttpServletRequest request) {
+    int status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+    CustomProblemDetails customProblemDetails = CustomProblemDetails.builder()
+        .status(status)
+        .title("Failed to create tasks with AI")
+        .details(ex.getMessage())
+        .path(request.getMethod() + " " + request.getRequestURI())
+        .build();
+    return ResponseEntity.status(status)
+        .body(customProblemDetails);
+  }
 }
