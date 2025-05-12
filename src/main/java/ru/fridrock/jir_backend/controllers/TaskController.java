@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.fridrock.jir_backend.dto.tasks.TaskDto;
@@ -25,12 +26,12 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public TaskDto create(@Valid TaskDto TaskDto) {
+    public TaskDto create(@Valid @RequestBody TaskDto TaskDto) {
         return taskService.create(TaskDto);
     }
 
     @PatchMapping
-    public TaskDto edit(@Valid TaskDto TaskDto) {
+    public TaskDto edit(@Valid @RequestBody TaskDto TaskDto) {
         return taskService.update(TaskDto);
     }
 

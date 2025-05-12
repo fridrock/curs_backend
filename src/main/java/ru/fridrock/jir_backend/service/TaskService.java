@@ -42,13 +42,11 @@ public class TaskService {
     public TaskDto update(TaskDto dto) {
         var taskEntity = taskRepository.findById(dto.taskId())
                 .orElseThrow(() -> taskNotFound(dto.taskId()));
-        taskEntity = taskEntity.toBuilder()
-                .description(dto.description())
-                .title(dto.title())
-                .deadline(dto.deadline())
-                .priority(dto.priority())
-                .hoursSpent(dto.hoursSpent())
-                .build();
+        taskEntity.setDescription(dto.description());
+        taskEntity.setDeadline(dto.deadline());
+        taskEntity.setPriority(dto.priority());
+        taskEntity.setHoursSpent(dto.hoursSpent());
+        taskEntity.setTitle(dto.title());
         return mapper.mapToDto(taskRepository.save(taskEntity));
     }
 
