@@ -1,6 +1,7 @@
 package ru.fridrock.jir_backend.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.fridrock.jir_backend.dto.projects.ProjectDto;
 import ru.fridrock.jir_backend.exception.NotFoundException;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectService {
   private final ProjectRepository projectRepository;
   private final UserRepository userRepository;

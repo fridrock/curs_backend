@@ -27,12 +27,12 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    public TaskDto create(@Valid TaskDto TaskDto) {
+    public TaskDto create(@Valid @RequestBody TaskDto TaskDto) {
         return taskService.create(TaskDto);
     }
 
     @PatchMapping
-    public TaskDto edit(@Valid TaskDto TaskDto) {
+    public TaskDto edit(@Valid @RequestBody TaskDto TaskDto) {
         return taskService.update(TaskDto);
     }
 

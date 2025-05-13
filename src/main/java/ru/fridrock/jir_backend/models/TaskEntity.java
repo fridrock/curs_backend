@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.persistence.Column;
 import ru.fridrock.jir_backend.models.enums.TaskPriority;
 import ru.fridrock.jir_backend.models.enums.TaskSource;
 import ru.fridrock.jir_backend.models.enums.TaskStatus;
@@ -32,6 +33,7 @@ public class TaskEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID taskId;
     private String title;
+    @Column(columnDefinition = "TEXT")
     private String description;
     @ManyToOne
     private ProjectEntity project;

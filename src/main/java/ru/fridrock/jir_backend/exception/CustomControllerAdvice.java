@@ -8,6 +8,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class CustomControllerAdvice {
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<CustomProblemDetails> handleException(
+      Exception ex,
+      HttpServletRequest request) {
+    int status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+    CustomProblemDetails customProblemDetails = CustomProblemDetails.builder()
+        .status(status)
+        .title("internal error")
+        .details(ex.getMessage())
+        .path(request.getMethod() + " " + request.getRequestURI())
+        .build();
+    return ResponseEntity.status(status)
+        .body(customProblemDetails);
+  }
+
+
   @ExceptionHandler(UnauthorizedException.class)
   public ResponseEntity<CustomProblemDetails> handleUnauthorizedException(
       UnauthorizedException ex,
