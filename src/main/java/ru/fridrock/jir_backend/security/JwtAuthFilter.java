@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -23,9 +22,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     String authHeader = request.getHeader("Authorization");
     if (authHeader != null && authHeader.startsWith("Bearer")) {
       String token = authHeader.substring(7);
-      JirAuthentication jirAuthentication = new JirAuthentication("", null,token, false);
+      MyAuthentication jirAuthentication = new MyAuthentication("", null, token, false);
       Authentication authentication = authenticationManager.authenticate(jirAuthentication);
-      log.info("received user with id:" + ((JirAuthentication)authentication).getUserId());
+      log.info("received user with id:" + ((MyAuthentication) authentication).getUserId());
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
