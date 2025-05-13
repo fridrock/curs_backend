@@ -1,6 +1,6 @@
 spring:
   application:
-    name: jir_backend
+    name: antiprocrostinate
   jpa:
     show-sql: true
     hibernate:
@@ -15,6 +15,6 @@ spring:
       platform: postgres
 
 jwt:
-  secret: "my_secret_long_long_long_long_long_long_long"
-  expiration: 3600000
+  secret: "secret"
+  expiration: 1800000
 
